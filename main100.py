@@ -2,7 +2,6 @@
 
 ################## Library ###################
 import argparse
-from ast import If
 from collections import namedtuple
 import random
 import string
@@ -23,6 +22,7 @@ def stop_test(key, result):
     if K == 32:  #32 -> space bar in ascii
         K = ('Space bar')
         print(colored('\n   Interrupted Test\n', 'red'))
+        result['test_end'] = ctime()
         pprint(result)
         exit()
     else:
@@ -40,7 +40,7 @@ def start_test():
         K = ('Space bar')
         print('Terminating the test...')
         sleep(1)
-        pprint()
+        exit()
     else:
         print('\nStarting...\n')
         sleep(1)
@@ -76,15 +76,20 @@ def key_press(result):
         return result
 
 ############## Time mode #####################
-def timeMode(time, result_dict, ):
-    while (time.time()-init_time) != time:
+def timeMode(t, result_dict):
+    init_time = time.time()
+    while result_dict['test_duration'] < t:
         key_press(result_dict)
+        result_dict['test_duration'] = time.time() - init_time
+        print(result_dict['test_duration'])
     return result_dict
 
 ############# Max Value mode #################
 def Max_value_mode(max_num, result_dict):
+    init_time = time.time()  
     for i in range(max_num):
         key_press(result_dict)
+        result_dict['test_duration'] = time.time() - init_time
     return result_dict
 
 ################## main #######################
@@ -106,20 +111,17 @@ def main():
         'type_miss_average_duration': 0}
     
     if args['use_time_mode']:
-        print('Test Mode: Time mode - ' + str(args['max_value'] + 'seconds'))
+        print('Test Mode: Time mode - ' + str(args['max_value']) + 'seconds')
         start_test() 
         result_dict['test_start'] = ctime()
-        init_time = time.time() 
         result_dict = timeMode(args['max_value'], result_dict)
     else:
         print('Time mode: Off. Test Mode: Max Value - ' + str(args['max_value']) + ' responses')
         start_test()
         result_dict['test_start'] = ctime()
-        init_time = time.time()
         result_dict = Max_value_mode(args['max_value'], result_dict)
        
-    result_dict['test_end'] = ctime()
-    result_dict['test_duration'] = time.time() - init_time 
+    result_dict['test_end'] = ctime() 
 
     print(colored(('\nThe test was finished\n'), 'blue'))
     print('The result:')
