@@ -17,6 +17,17 @@ from pprint import pprint
 ###### Variable input from type tuble ########
 Input = namedtuple('Input', ['requested', 'received', 'duration']) #complex = namedtuble('complex', ['r','i'])
 
+######### Fuction that stops the test when space is pressed  ##########
+def stop_test(key, result):
+    K = ord(key) #K -> character pressed to initialize the test
+    if K == 32:  #32 -> space bar in ascii
+        K = ('Space bar')
+        print(colored('\n   Interrupted Test\n', 'red'))
+        pprint(result)
+        exit()
+    else:
+        return True
+
 ######### Fuction to start the test ##########
 def start_test():
 
@@ -29,7 +40,7 @@ def start_test():
         K = ('Space bar')
         print('Terminating the test...')
         sleep(1)
-        exit() #when space bar is pressed the program ends
+        pprint()
     else:
         print('\nStarting...\n')
         sleep(1)
@@ -37,7 +48,7 @@ def start_test():
 
 ### Fuction to generate a random letter and read the press key####
 def key_press(result):
-        
+
     rand_letter=random.choice(string.ascii_lowercase)
     print('Type Letter ', colored((rand_letter), 'blue'))
 
@@ -46,25 +57,27 @@ def key_press(result):
     key = readkey()
 
     end_time = time.time()
-    duration = end_time - start_time
 
-    press_result=Input(rand_letter, key, duration)
-    result['inputs'].append(press_result)
+    while stop_test(key, result):
+        
+        duration = end_time - start_time
 
-    result['number_of_hits'] +=1
+        press_result=Input(rand_letter, key, duration)
+        result['inputs'].append(press_result)
 
-    if key == rand_letter:
-        print('You typed letter ', colored((key), 'green'))
-        result['number_of_types'] += 1
-    else:
-        print('You typed letter ', colored((key), 'red'))
+        result['number_of_hits'] +=1
+
+        if key == rand_letter:
+            print('You typed letter ', colored((key), 'green'))
+            result['number_of_types'] += 1
+        else:
+            print('You typed letter ', colored((key), 'red'))
     
-    return result
+        return result
 
 ############## Time mode #####################
-def timeMode(t, result_dict):
-    t = 10
-    if result_dict['test_start']-time.time() != t:
+def timeMode(time, result_dict, ):
+    while (time.time()-init_time) != time:
         key_press(result_dict)
     return result_dict
 
@@ -80,6 +93,7 @@ def main():
     parser.add_argument('-utm', '--use_time_mode', action = 'store_true', help = 'Max number of secs for time mode or maximum number os inputs for number of inputs mode.')
     parser.add_argument('-mv', '--max_value',type = int, required = True, help='Max number of seconds for time mode or maximum number os inputs for number inputs mode.')
     args = vars(parser.parse_args())
+
     result_dict = {
         'inputs': [],
         'number_of_hits': 0,
@@ -91,24 +105,19 @@ def main():
         'type_hit_average_duration': 0,
         'type_miss_average_duration': 0}
     
-   
     if args['use_time_mode']:
-        print('Test Mode: Time mode - ' + str(args['max_number'] + 'seconds'))
+        print('Test Mode: Time mode - ' + str(args['max_value'] + 'seconds'))
         start_test() 
         result_dict['test_start'] = ctime()
         init_time = time.time() 
-        result_dict = timeMode(args['max_number'], result_dict)
+        result_dict = timeMode(args['max_value'], result_dict)
     else:
-        print('Test Mode: Max Value - ' + str(args['max_value']) + ' responses')
+        print('Time mode: Off. Test Mode: Max Value - ' + str(args['max_value']) + ' responses')
         start_test()
         result_dict['test_start'] = ctime()
         init_time = time.time()
         result_dict = Max_value_mode(args['max_value'], result_dict)
        
-
-    #timeMode(result_dict)
-    #Max_value_mode(result_dict)
-
     result_dict['test_end'] = ctime()
     result_dict['test_duration'] = time.time() - init_time 
 
