@@ -62,16 +62,14 @@ def key_press(result):
     return result
 
 ############## Time mode #####################
-def timeMode(result_dict):
+def timeMode(t, result_dict):
     t = 10
     if result_dict['test_start']-time.time() != t:
         key_press(result_dict)
     return result_dict
 
 ############# Max Value mode #################
-def Max_value_mode(result_dict):
-    print(result_dict['test_start'])
-    max_num=10
+def Max_value_mode(max_num, result_dict):
     for i in range(max_num):
         key_press(result_dict)
     return result_dict
@@ -80,9 +78,8 @@ def Max_value_mode(result_dict):
 def main():
     parser = argparse.ArgumentParser(description='Definition of test mode')
     parser.add_argument('-utm', '--use_time_mode', action = 'store_true', help = 'Max number of secs for time mode or maximum number os inputs for number of inputs mode.')
-    parser.add_argument('-mv MAX_VALUE', '--max_value MAX_VALUE',type = int, required = True, help='Max number of seconds for time mode or maximum number os inputs for number inputs mode.')
-    #args = parser.parse_args()
-
+    parser.add_argument('-mv', '--max_value',type = int, required = True, help='Max number of seconds for time mode or maximum number os inputs for number inputs mode.')
+    args = vars(parser.parse_args())
     result_dict = {
         'inputs': [],
         'number_of_hits': 0,
@@ -94,27 +91,30 @@ def main():
         'type_hit_average_duration': 0,
         'type_miss_average_duration': 0}
     
-    if start_test():
-
+   
+    if args['use_time_mode']:
+        print('Test Mode: Time mode - ' + str(args['max_number'] + 'seconds'))
+        start_test() 
         result_dict['test_start'] = ctime()
-        init_time = time.time()                 #seconds passed since 01/01/1970
-        
-        #if arg['use_time_mode']:
-        #    print('Test Mode: Time mode ' + str(args['max_number]) + 'seconds)
-        #     result_dict=timeMode(args['max_number'], result_dict) 
-        #else:
-         #    print('Test Mode: Time mode ' + str(args['max_number]) + 'seconds)
-         #    result_dict=Max_value_mode(args['max_number'], result_dict) 
+        init_time = time.time() 
+        result_dict = timeMode(args['max_number'], result_dict)
+    else:
+        print('Test Mode: Max Value - ' + str(args['max_value']) + ' responses')
+        start_test()
+        result_dict['test_start'] = ctime()
+        init_time = time.time()
+        result_dict = Max_value_mode(args['max_value'], result_dict)
+       
 
-        timeMode(result_dict)
-        #Max_value_mode(result_dict)
+    #timeMode(result_dict)
+    #Max_value_mode(result_dict)
 
-        result_dict['test_end'] = ctime()
-        result_dict['test_duration'] = time.time() - init_time 
+    result_dict['test_end'] = ctime()
+    result_dict['test_duration'] = time.time() - init_time 
 
-        print(colored(('\nThe test was finished\n'), 'blue'))
-        print('The result:')
-        pprint(result_dict)
+    print(colored(('\nThe test was finished\n'), 'blue'))
+    print('The result:')
+    pprint(result_dict)
 
 if __name__ == '__main__':
     main() 
