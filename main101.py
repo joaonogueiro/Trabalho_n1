@@ -56,6 +56,14 @@ def key_press(result):
 
     result['test_duration'] += duration
 
+    if key == ' ':  # 32 -> space bar in ascii
+        print('Terminating the test...')
+        sleep(1)
+        exit_(result)
+        exit()
+
+
+
 
     if key == rand_letter:
         print('You typed letter ', colored((key), 'green'))
@@ -79,6 +87,25 @@ def Max_value_mode(max_num, result_dict):
         key_press(result_dict)
     return result_dict
 
+def exit_(result):
+    result['test_end'] = ctime()
+
+    result['type_average_duration'] = (result['test_duration'])/(result['number_of_types'])
+
+    if result['number_of_hits'] == 0:
+        result['type_hit_average_duration'] = 99999999999999
+    else:
+        result['type_hit_average_duration'] = (result['test_duration'])/(result['number_of_hits'])
+
+    result['type_miss_average_duration'] = (result['test_duration'])/((result['number_of_types'])-(result['number_of_hits']))
+
+
+
+
+
+    print(colored(('\nThe test was finished\n'), 'blue'))
+    print('The result:')
+    pprint(result)
 
 ################## main #######################
 def main():
@@ -115,19 +142,8 @@ def main():
     # timeMode(result_dict)
     # Max_value_mode(result_dict)
 
-    result_dict['test_end'] = ctime()
 
-    result_dict['type_average_duration'] = (result_dict['test_duration'])/(result_dict['number_of_types'])
-    result_dict['type_hit_average_duration'] = (result_dict['test_duration'])/(result_dict['number_of_hits'])
-    result_dict['type_miss_average_duration'] = (result_dict['test_duration'])/((result_dict['number_of_types'])-(result_dict['number_of_hits']))
-
-
-
-
-
-    print(colored(('\nThe test was finished\n'), 'blue'))
-    print('The result:')
-    pprint(result_dict)
+    exit_(result_dict)
 
 
 if __name__ == '__main__':
