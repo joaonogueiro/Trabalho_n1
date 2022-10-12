@@ -6,7 +6,6 @@ from ast import If
 from collections import namedtuple
 import random
 import string
-from tracemalloc import start
 from readchar import readkey
 from termcolor import colored
 from time import sleep, time, ctime
@@ -49,21 +48,11 @@ def key_press(result):
     end_time = time.time()
     duration = end_time - start_time
 
-    press_result = Input(rand_letter, key, duration)
-    result['inputs'].append(press_result)
-
-    result['number_of_types'] += 1
-
-    result['test_duration'] += duration
-
     if key == ' ':  # 32 -> space bar in ascii
         print('Terminating the test...')
         sleep(1)
-        exit_(result)
+        pretty_print(result)
         exit()
-
-
-
 
     if key == rand_letter:
         print('You typed letter ', colored((key), 'green'))
@@ -71,8 +60,15 @@ def key_press(result):
     else:
         print('You typed letter ', colored((key), 'red'))
 
-    return result
+    press_result = Input(rand_letter, key, duration)
 
+    result['inputs'].append(press_result)
+
+    result['number_of_types'] += 1
+
+    result['test_duration'] += duration
+
+    return result
 
 ############## Time mode #####################
 def timeMode(t, result_dict):
@@ -87,10 +83,15 @@ def Max_value_mode(max_num, result_dict):
         key_press(result_dict)
     return result_dict
 
-def exit_(result):
+def pretty_print(result):
     result['test_end'] = ctime()
 
     result['type_average_duration'] = (result['test_duration'])/(result['number_of_types'])
+    
+    if result['number_of_types']==0:
+        result['type_miss_average_duration'] = 99999999999999
+    else:
+        result['type_miss_average_duration'] = (result['test_duration'])/(result['number_of_hits'])
 
     if result['number_of_hits'] == 0:
         result['type_hit_average_duration'] = 99999999999999
@@ -98,10 +99,6 @@ def exit_(result):
         result['type_hit_average_duration'] = (result['test_duration'])/(result['number_of_hits'])
 
     result['type_miss_average_duration'] = (result['test_duration'])/((result['number_of_types'])-(result['number_of_hits']))
-
-
-
-
 
     print(colored(('\nThe test was finished\n'), 'blue'))
     print('The result:')
@@ -139,12 +136,7 @@ def main():
         init_time = time.time()
         result_dict = Max_value_mode(args['max_value'], result_dict)
 
-    # timeMode(result_dict)
-    # Max_value_mode(result_dict)
-
-
-    exit_(result_dict)
-
+    pretty_print(result_dict)
 
 if __name__ == '__main__':
     main()
