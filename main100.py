@@ -2,8 +2,8 @@
 
 ################## Library ###################
 import argparse
+from ast import If
 from collections import namedtuple
-from inspect import ArgSpec
 import random
 import string
 from tracemalloc import start
@@ -16,7 +16,6 @@ from pprint import pprint
 
 ###### Variable input from type tuble ########
 Input = namedtuple('Input', ['requested', 'received', 'duration']) #complex = namedtuble('complex', ['r','i'])
-
 
 ######### Fuction to start the test ##########
 def start_test():
@@ -36,33 +35,42 @@ def start_test():
         sleep(1)
         return True
 
-### Fuction to generate a random letter #####
-def generate_letter():
-    letter=random.choice(string.ascii_lowercase)
-    return letter
-
-### Fuction to generate a random letter #####
+### Fuction to generate a random letter and read the press key####
 def key_press(result):
-    s = generate_letter() 
-    print('Type Letter ', colored((s), 'blue'))
+        
+    rand_letter=random.choice(string.ascii_lowercase)
+    print('Type Letter ', colored((rand_letter), 'blue'))
+
     start_time = time.time()
+
     key = readkey()
+
     end_time = time.time()
-    press_time = end_time - start_time
-    result['inputs'].append(key)
-    if key == s:
+    duration = end_time - start_time
+
+    press_result=Input(rand_letter, key, duration)
+    result['inputs'].append(press_result)
+
+    result['number_of_hits'] +=1
+
+    if key == rand_letter:
         print('You typed letter ', colored((key), 'green'))
+        result['number_of_types'] += 1
     else:
         print('You typed letter ', colored((key), 'red'))
-    print('The duration was: ' + str(press_time))   
+    
     return result
 
 ############## Time mode #####################
-def Time_mode():
-    pass
-    
+def timeMode(result_dict):
+    t = 10
+    if result_dict['test_start']-time.time() != t:
+        key_press(result_dict)
+    return result_dict
+
 ############# Max Value mode #################
 def Max_value_mode(result_dict):
+    print(result_dict['test_start'])
     max_num=10
     for i in range(max_num):
         key_press(result_dict)
@@ -71,9 +79,9 @@ def Max_value_mode(result_dict):
 ################## main #######################
 def main():
     parser = argparse.ArgumentParser(description='Definition of test mode')
-    parser.add_argument('-utm', '--use_time_mode', type = int, required = True, help='Max number of secs for time mode or maximum number os inputs for number of inputs mode.')
+    parser.add_argument('-utm', '--use_time_mode', action = 'store_true', help = 'Max number of secs for time mode or maximum number os inputs for number of inputs mode.')
     parser.add_argument('-mv MAX_VALUE', '--max_value MAX_VALUE',type = int, required = True, help='Max number of seconds for time mode or maximum number os inputs for number inputs mode.')
-   # args = parser.parse_args()
+    #args = parser.parse_args()
 
     result_dict = {
         'inputs': [],
@@ -85,13 +93,21 @@ def main():
         'type_average_duration': 0,
         'type_hit_average_duration': 0,
         'type_miss_average_duration': 0}
-
+    
     if start_test():
 
         result_dict['test_start'] = ctime()
         init_time = time.time()                 #seconds passed since 01/01/1970
         
-        Max_value_mode(result_dict)
+        #if arg['use_time_mode']:
+        #    print('Test Mode: Time mode ' + str(args['max_number]) + 'seconds)
+        #     result_dict=timeMode(args['max_number'], result_dict) 
+        #else:
+         #    print('Test Mode: Time mode ' + str(args['max_number]) + 'seconds)
+         #    result_dict=Max_value_mode(args['max_number'], result_dict) 
+
+        timeMode(result_dict)
+        #Max_value_mode(result_dict)
 
         result_dict['test_end'] = ctime()
         result_dict['test_duration'] = time.time() - init_time 
