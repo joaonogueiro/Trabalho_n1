@@ -68,7 +68,7 @@ def key_press(result):
 
 ############## Time mode #####################
 def timeMode(t, result_dict):
-    if result_dict['test_duration'] < t:
+    while result_dict['test_duration'] < t:
         key_press(result_dict)
     return result_dict
 
@@ -100,11 +100,11 @@ def main():
         'type_miss_average_duration': 0}
 
     if args['use_time_mode']:
-        print('Test Mode: Time mode - ' + str(args['max_number'] + 'seconds'))
+        print('Test Mode: Time mode - ' + str(args['max_value']) + 'seconds')
         start_test()
         result_dict['test_start'] = ctime()
         init_time = time.time()
-        result_dict = timeMode(args['max_number'], result_dict)
+        result_dict = timeMode(args['max_value'], result_dict)
     else:
         print('Test Mode: Max Value - ' + str(args['max_value']) + ' responses')
         start_test()

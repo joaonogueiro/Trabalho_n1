@@ -78,7 +78,7 @@ def key_press(result):
 ############## Time mode #####################
 def timeMode(t, result_dict):
     init_time = time.time()
-    while result_dict['test_duration'] < t:
+    while result_dict['test_duration'] < float(t):
         key_press(result_dict)
         result_dict['test_duration'] = time.time() - init_time
         print(result_dict['test_duration'])
