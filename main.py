@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-################## Library ###################
+################## Library ##################
 import argparse
 from ast import If
 from collections import namedtuple
@@ -11,15 +11,13 @@ from termcolor import colored
 from time import sleep, time, ctime
 import time
 from pprint import pprint
-
 ##############################################
 
 ###### Variable input from type tuble ########
 Types = namedtuple('Types', ['requested', 'received', 'duration'])  # complex = namedtuble('complex', ['r','i'])
 
-
 ######### Fuction to start the test ##########
-def start_test():
+def startTest():
     print('Press any key to start the test')
     print(colored(('    Press space to finish'), 'red'))
 
@@ -35,9 +33,8 @@ def start_test():
         sleep(1)
         return True
 
-
 ### Fuction to generate a random letter and read the press key####
-def key_press(result):
+def keyPress(result):
     rand_letter = random.choice(string.ascii_lowercase)
     print('Type Letter ', colored((rand_letter), 'blue'))
 
@@ -53,7 +50,7 @@ def key_press(result):
     if key == ' ':  # 32 -> space bar in ascii
         print('Terminating the test...')
         sleep(1)
-        pretty_print(result)
+        prettyPrint(result)
         exit()
 
     if key == rand_letter:
@@ -68,54 +65,46 @@ def key_press(result):
 
     result['number_of_types'] += 1
 
-
     return result
 
 ############## Time mode #####################
 def timeMode(t, result_dict):
     while result_dict['test_duration'] < t:
-        key_press(result_dict)
+        keyPress(result_dict)
     return result_dict
-
 
 ############# Max Value mode #################
-def Max_value_mode(max_num, result_dict):
+def maxValueMode(max_num, result_dict):
     for i in range(max_num):
-        key_press(result_dict)
+        keyPress(result_dict)
     return result_dict
 
-def pretty_print(result):
+############# Game performance #################
+def prettyPrint(result):
     result['test_end'] = ctime()
 
-
-    if result['number_of_types'] == 0:
+    if result['number_of_types'] == 0:      #if the player has given up on the first move
         result['accuracy'] = 0.0
-        result['type_average_duration'] = 99999999999999
+        result['type_average_duration'] = 0.0
     else:
         result['accuracy'] = (result['number_of_hits']) / (result['number_of_types'])
         result['type_average_duration'] = (result['test_duration']) / (result['number_of_types'])
 
-
-
-    if result['number_of_hits'] == 0:
-        result['type_hit_average_duration'] = 99999999999999
+    if result['number_of_hits'] == 0:       #haven't hit anything
+        result['type_hit_average_duration'] = 0.0
     else:
         result['type_hit_average_duration'] = (result['test_duration'])/(result['number_of_hits'])
 
-
-
-    if result['number_of_types'] == result['number_of_hits']:
-        result['type_miss_average_duration'] = 99999999999999
+    if result['number_of_types'] == result['number_of_hits']: #hit everything 
+        result['type_miss_average_duration'] = 0.0
     else:
         result['type_miss_average_duration'] = (result['test_duration']) / ((result['number_of_types']) - (result['number_of_hits']))
-
-
 
     print(colored(('\nThe test was finished\n'), 'blue'))
     print('The result:')
     pprint(result)
 
-################## main #######################
+################## Main #######################
 def main():
     parser = argparse.ArgumentParser(description='Definition of test mode')
     parser.add_argument('-utm', '--use_time_mode', action='store_true',
@@ -136,19 +125,19 @@ def main():
         'type_miss_average_duration': 0}
 
     if args['use_time_mode']:
-        print('Test Mode: Time mode - ' + str(args['max_value']) + 'seconds')
-        start_test()
+        print('Test Mode: Time mode - ' + str(args['max_value']) + ' seconds')
+        startTest()
         result_dict['test_start'] = ctime()
         init_time = time.time()
         result_dict = timeMode(args['max_value'], result_dict)
     else:
         print('Test Mode: Max Value - ' + str(args['max_value']) + ' responses')
-        start_test()
+        startTest()
         result_dict['test_start'] = ctime()
         init_time = time.time()
-        result_dict = Max_value_mode(args['max_value'], result_dict)
+        result_dict = maxValueMode(args['max_value'], result_dict)
 
-    pretty_print(result_dict)
+    prettyPrint(result_dict)
 
 if __name__ == '__main__':
     main()
